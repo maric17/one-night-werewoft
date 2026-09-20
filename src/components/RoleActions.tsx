@@ -44,11 +44,17 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
         setSelectedPlayers([playerId]);
       }
     } else if (roleName === 'Robber') {
+      // Robber cannot select themselves
+      if (playerId === playersWithRole[0]?.id) return;
+      
       // Robber swaps with 1 player (lock in pick)
       if (!selectedPlayers.includes(playerId) && selectedPlayers.length < 1) {
         setSelectedPlayers([playerId]);
       }
     } else if (roleName === 'Troublemaker') {
+      // Troublemaker cannot select themselves
+      if (playerId === playersWithRole[0]?.id) return;
+      
       // Troublemaker swaps 2 players (lock in picks)
       if (!selectedPlayers.includes(playerId) && selectedPlayers.length < 2) {
         setSelectedPlayers([...selectedPlayers, playerId]);
@@ -131,8 +137,8 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
     if (playersWithRole.length === 0) return true;
     if (roleName === 'Werewolf') return true; // Lone werewolf action is optional
     if (roleName === 'Seer') return selectedPlayers.length === 1 || selectedCenter.length > 0;
-    if (roleName === 'Robber') return selectedPlayers.length === 1;
-    if (roleName === 'Troublemaker') return selectedPlayers.length === 2;
+    if (roleName === 'Robber') return selectedPlayers.length === 1 || selectedPlayers.length === 0;
+    if (roleName === 'Troublemaker') return selectedPlayers.length === 2 || selectedPlayers.length === 0;
     if (roleName === 'Insomniac') return true;
     return true;
   };
