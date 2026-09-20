@@ -46,7 +46,7 @@ export default function PassView() {
             <div className={styles.cardContainer}>
               <Card 
                 role={currentPlayer.originalRole!} 
-                isFlipped={true} 
+                isFlipped={false} 
               />
             </div>
             <p className={styles.helperText}>Memorize your role, then tap below to hide it.</p>
