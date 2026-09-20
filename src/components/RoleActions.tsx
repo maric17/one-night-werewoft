@@ -172,15 +172,15 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
               const isFellowWerewolf = roleName === 'Werewolf' && p.originalRole?.name === 'Werewolf';
               // Seer looking at a player
               const isSeerTarget = roleName === 'Seer' && isSelected;
-              // Robber looking at their new card (after confirm)
-              const isRobberTarget = roleName === 'Robber' && actionDone && p.id === playersWithRole[0]?.id;
+              // Robber looking at their new card (after confirm) which is the target's original card
+              const isRobberTarget = roleName === 'Robber' && actionDone && p.id === selectedPlayers[0];
               // Insomniac sees their own card
               const isInsomniacSelf = roleName === 'Insomniac' && p.id === playersWithRole[0]?.id;
               
               const isFlipped = !(isFellowWerewolf || isSeerTarget || isRobberTarget || isInsomniacSelf);
 
-              // Display the role they CURRENTLY have, unless it's before the action is done (then original)
-              const roleToDisplay = ((actionDone && roleName === 'Robber') || isInsomniacSelf) ? p.currentRole : p.originalRole;
+              // Insomniac needs to see their current role. Everyone else can just show originalRole (since Robber wants to see what the target originally had).
+              const roleToDisplay = isInsomniacSelf ? p.currentRole : p.originalRole;
 
               return (
                 <div key={p.id} className={styles.playerWrapper}>

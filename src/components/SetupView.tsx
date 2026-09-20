@@ -24,7 +24,7 @@ export default function SetupView() {
   const [showInstructions, setShowInstructions] = useState(false);
 
   const addPlayer = () => {
-    if (!name.trim()) return;
+    if (!name.trim() || state.players.length >= 5) return;
     setState(prev => ({
       ...prev,
       players: [...prev.players, { id: Date.now().toString(), name, originalRole: null, currentRole: null }]
@@ -137,7 +137,14 @@ export default function SetupView() {
             placeholder="Enter player name"
             onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
           />
-          <button className={styles.button} onClick={addPlayer}>Add</button>
+          <button 
+            className={styles.button} 
+            onClick={addPlayer}
+            disabled={state.players.length >= 5}
+            style={{ opacity: state.players.length >= 5 ? 0.5 : 1 }}
+          >
+            Add
+          </button>
         </div>
         
         <ul className={styles.playerList}>
