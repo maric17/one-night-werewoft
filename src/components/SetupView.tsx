@@ -122,13 +122,21 @@ export default function SetupView() {
             const uniqueId = `${role.name}-${idx}`;
             const isSelected = state.availableRoles.some(r => r.id === uniqueId);
             return (
-              <Card 
+              <div 
                 key={uniqueId}
-                role={{ ...role, id: uniqueId }}
-                isSelected={isSelected}
-                isFlipped={false} // Always show face up during setup
-                onClick={() => toggleRole(role, idx)}
-              />
+                style={{
+                  opacity: isSelected ? 1 : 0.4,
+                  filter: isSelected ? 'none' : 'grayscale(100%)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Card 
+                  role={{ ...role, id: uniqueId }}
+                  isSelected={isSelected}
+                  isFlipped={false} // Always show face up during setup
+                  onClick={() => toggleRole(role, idx)}
+                />
+              </div>
             );
           })}
         </div>

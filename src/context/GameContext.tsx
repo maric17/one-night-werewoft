@@ -9,7 +9,7 @@ type GameContextType = {
 
 const initialState: GameState = {
   players: [],
-  availableRoles: [{ name: 'Werewolf', team: 'Werewolf', id: 'Werewolf-0' }],
+  availableRoles: [],
   centerCards: [],
   phase: 'SETUP',
 };
