@@ -69,9 +69,28 @@ export default function SetupView() {
 
   const startGame = () => {
     setState(prev => {
-      // 1. Shuffle available roles
+      // Shuffle available roles
       const deck = [...prev.availableRoles].sort(() => Math.random() - 0.5);
       
+      // Ensure at least 1 Werewolf goes to a player (not the center)
+      const numPlayers = prev.players.length;
+      const playerDealtCards = deck.slice(0, numPlayers);
+      
+      const hasWerewolf = playerDealtCards.some(card => card.name === 'Werewolf');
+      const werewolfInGame = deck.some(card => card.name === 'Werewolf');
+
+      if (werewolfInGame && !hasWerewolf) {
+        // Find a werewolf in the center cards (which are after numPlayers)
+        const centerWerewolfIdx = deck.findIndex((card, idx) => idx >= numPlayers && card.name === 'Werewolf');
+        // Find a random non-werewolf card in the player cards to swap with
+        const randomPlayerIdx = Math.floor(Math.random() * numPlayers);
+        
+        // Swap them
+        const temp = deck[randomPlayerIdx];
+        deck[randomPlayerIdx] = deck[centerWerewolfIdx];
+        deck[centerWerewolfIdx] = temp;
+      }
+
       // 2. Deal to players
       const newPlayers = prev.players.map((p, idx) => ({
         ...p,
