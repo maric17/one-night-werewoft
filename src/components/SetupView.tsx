@@ -126,7 +126,7 @@ export default function SetupView() {
                 key={uniqueId}
                 role={{ ...role, id: uniqueId }}
                 isSelected={isSelected}
-                isFlipped={!isSelected} // Face down if not selected, face up if selected
+                isFlipped={false} // Always show face up during setup
                 onClick={() => toggleRole(role, idx)}
               />
             );

@@ -8,10 +8,10 @@ type GameContextType = {
 };
 
 const initialState: GameState = {
-  phase: 'SETUP',
   players: [],
+  availableRoles: [{ name: 'Werewolf', team: 'Werewolf', id: 'Werewolf-0' }],
   centerCards: [],
-  availableRoles: [],
+  phase: 'SETUP',
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
