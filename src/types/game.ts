@@ -1,6 +1,12 @@
 export type GamePhase = 'SETUP' | 'PASS_AND_VIEW' | 'NIGHT' | 'DAY' | 'VOTING' | 'GAMEOVER';
 
-export type RoleName = 'Werewolf' | 'Seer' | 'Robber' | 'Troublemaker' | 'Villager';
+export type RoleName = 
+  | 'Werewolf' 
+  | 'Seer' 
+  | 'Robber' 
+  | 'Troublemaker' 
+  | 'Villager'
+  | 'Insomniac';
 
 export type Role = {
   id: string;

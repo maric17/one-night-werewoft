@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { RoleName } from '../types/game';
 import Card from './Card';
@@ -127,6 +127,8 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
         return "Select 1 player to rob (swap cards and look).";
       case 'Troublemaker':
         return "Select 2 players to swap their cards (without looking).";
+      case 'Insomniac':
+        return "Look at your card to see if your role changed.";
       default:
         return "";
     }
@@ -138,6 +140,7 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
     if (roleName === 'Seer') return selectedPlayers.length === 1 || selectedCenter.length > 0;
     if (roleName === 'Robber') return selectedPlayers.length === 1;
     if (roleName === 'Troublemaker') return selectedPlayers.length === 2;
+    if (roleName === 'Insomniac') return true;
     return true;
   };
 
@@ -178,11 +181,13 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
               const isSeerTarget = roleName === 'Seer' && isSelected;
               // Robber looking at their new card (after confirm)
               const isRobberTarget = roleName === 'Robber' && actionDone && p.id === playersWithRole[0]?.id;
+              // Insomniac sees their own card
+              const isInsomniacSelf = roleName === 'Insomniac' && p.id === playersWithRole[0]?.id;
               
-              const isFlipped = !(isFellowWerewolf || isSeerTarget || isRobberTarget);
+              const isFlipped = !(isFellowWerewolf || isSeerTarget || isRobberTarget || isInsomniacSelf);
 
               // Display the role they CURRENTLY have, unless it's before the action is done (then original)
-              const roleToDisplay = (actionDone && roleName === 'Robber') ? p.currentRole : p.originalRole;
+              const roleToDisplay = ((actionDone && roleName === 'Robber') || isInsomniacSelf) ? p.currentRole : p.originalRole;
 
               return (
                 <div key={p.id} className={styles.playerWrapper}>

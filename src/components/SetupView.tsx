@@ -12,7 +12,7 @@ const BASE_DECK: Omit<Role, 'id'>[] = [
   { name: 'Seer', team: 'Village' },
   { name: 'Robber', team: 'Village' },
   { name: 'Troublemaker', team: 'Village' },
-  { name: 'Villager', team: 'Village' },
+  { name: 'Insomniac', team: 'Village' },
   { name: 'Villager', team: 'Village' },
   { name: 'Villager', team: 'Village' }
 ];
@@ -49,6 +49,12 @@ export default function SetupView() {
           availableRoles: prev.availableRoles.filter(r => r.id !== uniqueId)
         };
       } else {
+        // Enforce max 1 werewolf for 3 player games to keep it balanced
+        if (state.players.length === 3 && roleTemplate.name === 'Werewolf') {
+          const werewolfCount = prev.availableRoles.filter(r => r.name === 'Werewolf').length;
+          if (werewolfCount >= 1) return prev;
+        }
+
         return {
           ...prev,
           availableRoles: [...prev.availableRoles, { ...roleTemplate, id: uniqueId }]

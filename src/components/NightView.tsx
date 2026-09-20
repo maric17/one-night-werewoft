@@ -6,7 +6,7 @@ import { RoleName } from '../types/game';
 import RoleActions from './RoleActions';
 import styles from './NightView.module.css';
 
-const WAKE_ORDER: RoleName[] = ['Werewolf', 'Seer', 'Robber', 'Troublemaker'];
+const WAKE_ORDER: RoleName[] = ['Werewolf', 'Seer', 'Robber', 'Troublemaker', 'Insomniac'];
 
 export default function NightView() {
   const { state, setState } = useGame();
