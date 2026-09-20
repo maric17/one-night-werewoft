@@ -52,6 +52,8 @@
   object-fit: cover;
   opacity: 0.8;
   border-radius: 10px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .cardFront[data-team="Village"] {
@@ -97,4 +99,8 @@
   width: 90%;
   position: absolute;
   bottom: 8px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(1px); /* Force new rendering layer to fix bleed-through on old WebKit */
+  transform: translateZ(1px);
 }

@@ -21,26 +21,19 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   // Helper to get who actually has this role right now
   const playersWithRole = state.players.filter(p => p.originalRole?.name === roleName);
 
-  // Auto-skip if no one is this role and touches the screen
-  const [hasInteracted, setHasInteracted] = useState(false);
-
   useEffect(() => {
-    if (hasInteracted || actionDone) return;
-    
-    // If no one touches the screen for 12 seconds, assume the role is in the center and auto-skip
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 12000);
-
-    return () => clearTimeout(timer);
-  }, [hasInteracted, actionDone, onComplete]);
-
-  const handleInteraction = () => {
-    setHasInteracted(true);
-  };
+    // If NO ONE has this role, we must auto-skip after a delay.
+    // Otherwise, everyone has their eyes closed and the game will softlock forever!
+    // If someone DOES have the role, we never auto-skip. They MUST click confirm.
+    if (playersWithRole.length === 0) {
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 10000); // Wait 10 seconds to fake out the players
+      return () => clearTimeout(timer);
+    }
+  }, [playersWithRole.length, onComplete]);
 
   const handlePlayerClick = (playerId: string) => {
-    handleInteraction();
     if (actionDone) return;
     
     if (roleName === 'Seer') {
@@ -64,7 +57,6 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   };
 
   const handleCenterClick = (index: number) => {
-    handleInteraction();
     if (actionDone) return;
 
     if (roleName === 'Werewolf' && playersWithRole.length <= 1) {
@@ -82,7 +74,6 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   };
 
   const confirmAction = () => {
-    handleInteraction();
     if (roleName === 'Robber' && selectedPlayers.length === 1) {
       const targetId = selectedPlayers[0];
       const robberPlayer = playersWithRole[0];
@@ -147,7 +138,7 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   };
 
   return (
-    <div className={styles.container} onClick={handleInteraction}>
+    <div className={styles.container}>
       <p className={styles.instruction}>{getInstruction()}</p>
 
       <div className={styles.board}>

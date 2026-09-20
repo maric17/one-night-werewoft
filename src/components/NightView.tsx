@@ -50,8 +50,16 @@ export default function NightView() {
       if (werewolfCount === 1) {
         await speak("Werewolf, wake up. You may look at one center card.");
       } else {
-        await speak("Werewolves, wake up and look for other werewolves.");
+        await speak("Werewolves, wake up and acknowledge your fellow werewolves.");
       }
+    } else if (nextRole === 'Seer') {
+      await speak("Seer, wake up. Look at one player's card or up to two center cards.");
+    } else if (nextRole === 'Robber') {
+      await speak("Robber, wake up. Select one player to rob, swap cards, and look at your new card.");
+    } else if (nextRole === 'Troublemaker') {
+      await speak("Troublemaker, wake up. Select two players to swap their cards without looking.");
+    } else if (nextRole === 'Insomniac') {
+      await speak("Insomniac, wake up. Look at your own card to see if your role has changed.");
     } else {
       await speak(`${nextRole}, wake up and perform your action.`);
     }
