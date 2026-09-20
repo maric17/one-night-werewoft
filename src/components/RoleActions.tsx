@@ -19,6 +19,8 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   const [actionDone, setActionDone] = useState(false);
 
   // Helper to get who actually has this role right now
+  const playersWithRole = state.players.filter(p => p.originalRole?.name === roleName);
+
   // Auto-skip if no one is this role and touches the screen
   const [hasInteracted, setHasInteracted] = useState(false);
 
