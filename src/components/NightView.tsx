@@ -46,7 +46,12 @@ export default function NightView() {
     const nextRole = activeRolesInGame[index];
     
     if (nextRole === 'Werewolf') {
-      await speak("Werewolves, wake up and look for other werewolves.");
+      const werewolfCount = state.availableRoles.filter(r => r.name === 'Werewolf').length;
+      if (werewolfCount === 1) {
+        await speak("Werewolf, wake up. You may look at one center card.");
+      } else {
+        await speak("Werewolves, wake up and look for other werewolves.");
+      }
     } else {
       await speak(`${nextRole}, wake up and perform your action.`);
     }
@@ -57,7 +62,12 @@ export default function NightView() {
   const handleActionComplete = async () => {
     const currentRole = activeRolesInGame[currentActionIndex];
     if (currentRole === 'Werewolf') {
-      await speak("Werewolves, close your eyes.");
+      const werewolfCount = state.availableRoles.filter(r => r.name === 'Werewolf').length;
+      if (werewolfCount === 1) {
+        await speak("Werewolf, close your eyes.");
+      } else {
+        await speak("Werewolves, close your eyes.");
+      }
     } else {
       await speak(`${currentRole}, close your eyes.`);
     }

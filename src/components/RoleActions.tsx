@@ -19,21 +19,28 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   const [actionDone, setActionDone] = useState(false);
 
   // Helper to get who actually has this role right now
-  const playersWithRole = state.players.filter(p => p.originalRole?.name === roleName);
-  
-  if (playersWithRole.length === 0 && roleName !== 'Werewolf') {
-    // Should not happen based on filtering, but just in case
-    return (
-      <div className={styles.container}>
-        <p>No one has this role.</p>
-        <button className={styles.button} onClick={onComplete}>Done</button>
-      </div>
-    );
-  }
+  // Auto-skip if no one is this role and touches the screen
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  useEffect(() => {
+    if (hasInteracted || actionDone) return;
+    
+    // If no one touches the screen for 12 seconds, assume the role is in the center and auto-skip
+    const timer = setTimeout(() => {
+      onComplete();
+    }, 12000);
+
+    return () => clearTimeout(timer);
+  }, [hasInteracted, actionDone, onComplete]);
+
+  const handleInteraction = () => {
+    setHasInteracted(true);
+  };
 
   const handlePlayerClick = (playerId: string) => {
+    handleInteraction();
     if (actionDone) return;
-
+    
     if (roleName === 'Seer') {
       // Seer can look at 1 player card OR 2 center cards
       if (selectedCenter.length > 0) return;
@@ -55,9 +62,10 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   };
 
   const handleCenterClick = (index: number) => {
+    handleInteraction();
     if (actionDone) return;
 
-    if (roleName === 'Werewolf' && playersWithRole.length === 1) {
+    if (roleName === 'Werewolf' && playersWithRole.length <= 1) {
       // Lone werewolf can look at 1 center card (prevent unselecting to stop cheating)
       if (!selectedCenter.includes(index) && selectedCenter.length < 1) {
         setSelectedCenter([index]);
@@ -72,6 +80,7 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   };
 
   const confirmAction = () => {
+    handleInteraction();
     if (roleName === 'Robber' && selectedPlayers.length === 1) {
       const targetId = selectedPlayers[0];
       const robberPlayer = playersWithRole[0];
@@ -110,10 +119,10 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
     if (actionDone) return "Action complete. Tap Done when ready to sleep.";
     switch (roleName) {
       case 'Werewolf':
-        if (playersWithRole.length === 1) return "You are the lone werewolf! You may look at 1 center card.";
+        if (playersWithRole.length <= 1) return "You are the lone werewolf! You may look at 1 center card.";
         return "Acknowledge your fellow werewolves.";
       case 'Seer':
-        return "Look at 1 player's card OR 2 center cards.";
+        return "Look at 1 player's card OR up to 2 center cards.";
       case 'Robber':
         return "Select 1 player to rob (swap cards and look).";
       case 'Troublemaker':
@@ -124,15 +133,16 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
   };
 
   const isConfirmEnabled = () => {
-    if (roleName === 'Werewolf') return selectedCenter.length === 1 || playersWithRole.length > 1;
-    if (roleName === 'Seer') return selectedPlayers.length === 1 || selectedCenter.length === 2;
+    if (playersWithRole.length === 0) return true;
+    if (roleName === 'Werewolf') return true; // Lone werewolf action is optional
+    if (roleName === 'Seer') return selectedPlayers.length === 1 || selectedCenter.length > 0;
     if (roleName === 'Robber') return selectedPlayers.length === 1;
     if (roleName === 'Troublemaker') return selectedPlayers.length === 2;
     return true;
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClick={handleInteraction}>
       <p className={styles.instruction}>{getInstruction()}</p>
 
       <div className={styles.board}>
