@@ -4,6 +4,7 @@ import { useGame } from '../context/GameContext';
 import Card from './Card';
 import { Role } from '../types/game';
 import styles from './SetupView.module.css';
+import InstructionsModal from './InstructionsModal';
 
 // Base deck of available roles to pick from
 const BASE_DECK: Omit<Role, 'id'>[] = [
@@ -20,6 +21,7 @@ const BASE_DECK: Omit<Role, 'id'>[] = [
 export default function SetupView() {
   const { state, setState } = useGame();
   const [name, setName] = useState('');
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const addPlayer = () => {
     if (!name.trim()) return;
@@ -112,9 +114,20 @@ export default function SetupView() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>One Night Ultimate Werewolf</h1>
+      {showInstructions && <InstructionsModal onClose={() => setShowInstructions(false)} />}
       
-      <div className={styles.card}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '600px' }}>
+        <h1 className={styles.title} style={{ marginBottom: 0 }}>One Night Werewolf</h1>
+        <button 
+          className={styles.button} 
+          style={{ padding: '8px 16px', fontSize: '0.9rem', backgroundColor: '#475569' }}
+          onClick={() => setShowInstructions(true)}
+        >
+          How to Play
+        </button>
+      </div>
+      
+      <div className={styles.card} style={{ marginTop: '24px' }}>
         <h2>1. Add Players ({state.players.length})</h2>
         <div className={styles.inputGroup}>
           <input 
