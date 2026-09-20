@@ -1,0 +1,90 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  min-height: 100vh;
+  background-color: #0f172a;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  background: linear-gradient(to right, #f87171, #fb923c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.helperText {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  margin-bottom: 32px;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 48px;
+}
+
+.centerCards h3, .playerCards h3 {
+  color: #f1f5f9;
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+}
+
+.cardGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.playerWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.playerNameLabel {
+  margin-top: 12px;
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.swappedBadge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 10;
+  transform: rotate(10deg);
+}
+
+.button {
+  background: #10b981;
+  border: 1px solid #059669;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.button:hover {
+  background: #059669;
+}

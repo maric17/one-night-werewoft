@@ -1,0 +1,216 @@
+'use client';
+import { useState } from 'react';
+import { useGame } from '../context/GameContext';
+import { RoleName } from '../types/game';
+import Card from './Card';
+import styles from './RoleActions.module.css';
+
+type RoleActionsProps = {
+  roleName: RoleName;
+  onComplete: () => void;
+};
+
+export default function RoleActions({ roleName, onComplete }: RoleActionsProps) {
+  const { state, setState } = useGame();
+  
+  // Track selections for actions
+  const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
+  const [selectedCenter, setSelectedCenter] = useState<number[]>([]);
+  const [actionDone, setActionDone] = useState(false);
+
+  // Helper to get who actually has this role right now
+  const playersWithRole = state.players.filter(p => p.originalRole?.name === roleName);
+  
+  if (playersWithRole.length === 0 && roleName !== 'Werewolf') {
+    // Should not happen based on filtering, but just in case
+    return (
+      <div className={styles.container}>
+        <p>No one has this role.</p>
+        <button className={styles.button} onClick={onComplete}>Done</button>
+      </div>
+    );
+  }
+
+  const handlePlayerClick = (playerId: string) => {
+    if (actionDone) return;
+
+    if (roleName === 'Seer') {
+      // Seer can look at 1 player card OR 2 center cards
+      if (selectedCenter.length > 0) return;
+      if (selectedPlayers.includes(playerId)) {
+        setSelectedPlayers([]);
+      } else {
+        setSelectedPlayers([playerId]);
+      }
+    } else if (roleName === 'Robber') {
+      // Robber swaps with 1 player
+      if (selectedPlayers.includes(playerId)) {
+        setSelectedPlayers([]);
+      } else {
+        setSelectedPlayers([playerId]);
+      }
+    } else if (roleName === 'Troublemaker') {
+      // Troublemaker swaps 2 players
+      if (selectedPlayers.includes(playerId)) {
+        setSelectedPlayers(selectedPlayers.filter(id => id !== playerId));
+      } else if (selectedPlayers.length < 2) {
+        setSelectedPlayers([...selectedPlayers, playerId]);
+      }
+    }
+  };
+
+  const handleCenterClick = (index: number) => {
+    if (actionDone) return;
+
+    if (roleName === 'Werewolf' && playersWithRole.length === 1) {
+      // Lone werewolf can look at 1 center card
+      if (selectedCenter.includes(index)) {
+        setSelectedCenter([]);
+      } else {
+        setSelectedCenter([index]);
+      }
+    } else if (roleName === 'Seer') {
+      if (selectedPlayers.length > 0) return;
+      if (selectedCenter.includes(index)) {
+        setSelectedCenter(selectedCenter.filter(i => i !== index));
+      } else if (selectedCenter.length < 2) {
+        setSelectedCenter([...selectedCenter, index]);
+      }
+    }
+  };
+
+  const confirmAction = () => {
+    if (roleName === 'Robber' && selectedPlayers.length === 1) {
+      const targetId = selectedPlayers[0];
+      const robberPlayer = playersWithRole[0];
+      
+      setState(prev => {
+        const newPlayers = [...prev.players];
+        const rIndex = newPlayers.findIndex(p => p.id === robberPlayer.id);
+        const tIndex = newPlayers.findIndex(p => p.id === targetId);
+        
+        // Swap current roles
+        const temp = newPlayers[rIndex].currentRole;
+        newPlayers[rIndex].currentRole = newPlayers[tIndex].currentRole;
+        newPlayers[tIndex].currentRole = temp;
+        
+        return { ...prev, players: newPlayers };
+      });
+    } else if (roleName === 'Troublemaker' && selectedPlayers.length === 2) {
+      setState(prev => {
+        const newPlayers = [...prev.players];
+        const t1Index = newPlayers.findIndex(p => p.id === selectedPlayers[0]);
+        const t2Index = newPlayers.findIndex(p => p.id === selectedPlayers[1]);
+        
+        // Swap current roles
+        const temp = newPlayers[t1Index].currentRole;
+        newPlayers[t1Index].currentRole = newPlayers[t2Index].currentRole;
+        newPlayers[t2Index].currentRole = temp;
+        
+        return { ...prev, players: newPlayers };
+      });
+    }
+
+    setActionDone(true);
+  };
+
+  const getInstruction = () => {
+    if (actionDone) return "Action complete. Tap Done when ready to sleep.";
+    switch (roleName) {
+      case 'Werewolf':
+        if (playersWithRole.length === 1) return "You are the lone werewolf! You may look at 1 center card.";
+        return "Acknowledge your fellow werewolves.";
+      case 'Seer':
+        return "Look at 1 player's card OR 2 center cards.";
+      case 'Robber':
+        return "Select 1 player to rob (swap cards and look).";
+      case 'Troublemaker':
+        return "Select 2 players to swap their cards (without looking).";
+      default:
+        return "";
+    }
+  };
+
+  const isConfirmEnabled = () => {
+    if (roleName === 'Werewolf') return selectedCenter.length === 1 || playersWithRole.length > 1;
+    if (roleName === 'Seer') return selectedPlayers.length === 1 || selectedCenter.length === 2;
+    if (roleName === 'Robber') return selectedPlayers.length === 1;
+    if (roleName === 'Troublemaker') return selectedPlayers.length === 2;
+    return true;
+  };
+
+  return (
+    <div className={styles.container}>
+      <p className={styles.instruction}>{getInstruction()}</p>
+
+      <div className={styles.board}>
+        <div className={styles.centerCards}>
+          <h3>Center Cards</h3>
+          <div className={styles.cardGrid}>
+            {state.centerCards.map((card, idx) => {
+              const isSelected = selectedCenter.includes(idx);
+              // Face up if selected by Lone Werewolf or Seer
+              const isFlipped = !((roleName === 'Werewolf' || roleName === 'Seer') && isSelected);
+              
+              return (
+                <Card 
+                  key={`center-${idx}`} 
+                  role={card} 
+                  isFlipped={isFlipped}
+                  isSelected={isSelected}
+                  onClick={() => handleCenterClick(idx)}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.playerCards}>
+          <h3>Players</h3>
+          <div className={styles.cardGrid}>
+            {state.players.map(p => {
+              const isSelected = selectedPlayers.includes(p.id);
+              // Werewolves see each other
+              const isFellowWerewolf = roleName === 'Werewolf' && p.originalRole?.name === 'Werewolf';
+              // Seer looking at a player
+              const isSeerTarget = roleName === 'Seer' && isSelected;
+              // Robber looking at their new card (after confirm)
+              const isRobberTarget = roleName === 'Robber' && actionDone && p.id === playersWithRole[0]?.id;
+              
+              const isFlipped = !(isFellowWerewolf || isSeerTarget || isRobberTarget);
+
+              // Display the role they CURRENTLY have, unless it's before the action is done (then original)
+              const roleToDisplay = (actionDone && roleName === 'Robber') ? p.currentRole : p.originalRole;
+
+              return (
+                <div key={p.id} className={styles.playerWrapper}>
+                  <Card 
+                    role={roleToDisplay!} 
+                    isFlipped={isFlipped}
+                    isSelected={isSelected}
+                    onClick={() => handlePlayerClick(p.id)}
+                  />
+                  <span className={styles.playerNameLabel}>{p.name}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {!actionDone ? (
+        <button 
+          className={styles.button} 
+          onClick={confirmAction}
+          disabled={!isConfirmEnabled()}
+        >
+          Confirm Action
+        </button>
+      ) : (
+        <button className={styles.button} onClick={onComplete}>
+          Done
+        </button>
+      )}
+    </div>
+  );
+}
