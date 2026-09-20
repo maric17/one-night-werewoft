@@ -46,6 +46,8 @@
   background: linear-gradient(135deg, #1e293b, #0f172a);
   color: white;
   overflow: hidden;
+  -webkit-transform: rotateY(0deg);
+  transform: rotateY(0deg);
 }
 
 .cardImage {
@@ -91,7 +93,6 @@
 }
 
 .cardName {
-  z-index: 2;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 1), 0 0 10px rgba(0,0,0,0.8);
   background: rgba(0, 0, 0, 0.6);
   padding: 4px 8px;
@@ -101,6 +102,4 @@
   bottom: 8px;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transform: translateZ(1px); /* Force new rendering layer to fix bleed-through on old WebKit */
-  transform: translateZ(1px);
 }
