@@ -37,20 +37,19 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
     if (roleName === 'Seer') {
       // Seer can look at 1 player card OR 2 center cards
       if (selectedCenter.length > 0) return;
-      if (selectedPlayers.includes(playerId)) {
-        setSelectedPlayers([]);
-      } else {
+      // Prevent unselecting to stop cheating (card is revealed instantly)
+      if (!selectedPlayers.includes(playerId) && selectedPlayers.length < 1) {
         setSelectedPlayers([playerId]);
       }
     } else if (roleName === 'Robber') {
-      // Robber swaps with 1 player
+      // Robber swaps with 1 player (cards stay face down until confirmed, so unselecting is safe)
       if (selectedPlayers.includes(playerId)) {
         setSelectedPlayers([]);
       } else {
         setSelectedPlayers([playerId]);
       }
     } else if (roleName === 'Troublemaker') {
-      // Troublemaker swaps 2 players
+      // Troublemaker swaps 2 players (cards stay face down, so unselecting is safe)
       if (selectedPlayers.includes(playerId)) {
         setSelectedPlayers(selectedPlayers.filter(id => id !== playerId));
       } else if (selectedPlayers.length < 2) {
@@ -63,17 +62,14 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
     if (actionDone) return;
 
     if (roleName === 'Werewolf' && playersWithRole.length === 1) {
-      // Lone werewolf can look at 1 center card
-      if (selectedCenter.includes(index)) {
-        setSelectedCenter([]);
-      } else {
+      // Lone werewolf can look at 1 center card (prevent unselecting to stop cheating)
+      if (!selectedCenter.includes(index) && selectedCenter.length < 1) {
         setSelectedCenter([index]);
       }
     } else if (roleName === 'Seer') {
       if (selectedPlayers.length > 0) return;
-      if (selectedCenter.includes(index)) {
-        setSelectedCenter(selectedCenter.filter(i => i !== index));
-      } else if (selectedCenter.length < 2) {
+      // Seer can look at up to 2 center cards (prevent unselecting)
+      if (!selectedCenter.includes(index) && selectedCenter.length < 2) {
         setSelectedCenter([...selectedCenter, index]);
       }
     }
