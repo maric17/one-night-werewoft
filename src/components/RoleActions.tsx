@@ -42,17 +42,13 @@ export default function RoleActions({ roleName, onComplete }: RoleActionsProps) 
         setSelectedPlayers([playerId]);
       }
     } else if (roleName === 'Robber') {
-      // Robber swaps with 1 player (cards stay face down until confirmed, so unselecting is safe)
-      if (selectedPlayers.includes(playerId)) {
-        setSelectedPlayers([]);
-      } else {
+      // Robber swaps with 1 player (lock in pick)
+      if (!selectedPlayers.includes(playerId) && selectedPlayers.length < 1) {
         setSelectedPlayers([playerId]);
       }
     } else if (roleName === 'Troublemaker') {
-      // Troublemaker swaps 2 players (cards stay face down, so unselecting is safe)
-      if (selectedPlayers.includes(playerId)) {
-        setSelectedPlayers(selectedPlayers.filter(id => id !== playerId));
-      } else if (selectedPlayers.length < 2) {
+      // Troublemaker swaps 2 players (lock in picks)
+      if (!selectedPlayers.includes(playerId) && selectedPlayers.length < 2) {
         setSelectedPlayers([...selectedPlayers, playerId]);
       }
     }
