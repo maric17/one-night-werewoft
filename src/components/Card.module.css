@@ -44,6 +44,13 @@
 .cardFront {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   color: white;
+  overflow: hidden;
+}
+
+.cardImage {
+  object-fit: cover;
+  opacity: 0.8;
+  border-radius: 10px;
 }
 
 .cardFront[data-team="Village"] {
@@ -57,8 +64,14 @@
 }
 
 .cardBack {
-  background: linear-gradient(135deg, #334155, #1e293b);
-  color: #94a3b8;
+  background: repeating-linear-gradient(
+    45deg,
+    #1e293b,
+    #1e293b 10px,
+    #0f172a 10px,
+    #0f172a 20px
+  );
+  border: 2px solid #334155;
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
 }
@@ -71,5 +84,11 @@
 
 .cardName {
   z-index: 2;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 1), 0 0 10px rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 90%;
+  position: absolute;
+  bottom: 8px;
 }
